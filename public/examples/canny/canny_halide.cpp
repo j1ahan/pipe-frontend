@@ -1,3 +1,121 @@
+// Generator.cpp
+#include <Halide.h>
+using namespace Halide;
+
+class CannyGenerator : public Halide::Generator<CannyGenerator> {
+public:
+    Input<Buffer<uint8_t>> input{"input", 3};
+    Input<float> low_threshold{"low_threshold", 0.1f};
+    Input<float> high_threshold{"high_threshold", 0.3f};
+    Output<Buffer<uint8_t>> output{"output", 3};
+
+    void generate() {
+        Var x("x"), y("y"), c("c");
+
+        // Step 1: Convert to grayscale
+        Func gray("gray");
+        Expr r = cast<float>(input(x, y, 0)) / 255.0f;
+        Expr g = cast<float>(input(x, y, 1)) / 255.0f;
+        Expr b = cast<float>(input(x, y, 2)) / 255.0f;
+        gray(x, y) = 0.299f * r + 0.587f * g + 0.114f * b;
+
+        // Step 2: Gaussian blur (5x5)
+        Func gaussian("gaussian");
+        
+        // 5x5 Gaussian kernel coefficients
+        float gauss_kernel[5][5] = {
+            {2, 4, 5, 4, 2},
+            {4, 9, 12, 9, 4},
+            {5, 12, 15, 12, 5},
+            {4, 9, 12, 9, 4},
+            {2, 4, 5, 4, 2}
+        };
+        
+        // Apply boundary conditions and compute gaussian
+        Func gray_clamped = BoundaryConditions::repeat_edge(gray, {{0, input.width()}, {0, input.height()}});
+        Expr gauss_sum = cast<float>(0);
+        Expr valid_gaussian = x >= 2 && x < input.width() - 2 && y >= 2 && y < input.height() - 2;
+        
+        for (int dy = -2; dy <= 2; dy++) {
+            for (int dx = -2; dx <= 2; dx++) {
+                gauss_sum += gray_clamped(x + dx, y + dy) * gauss_kernel[dy + 2][dx + 2];
+            }
+        }
+        gaussian(x, y) = select(valid_gaussian, gauss_sum / 159.0f, 0.0f);
+
+        // Step 3: Sobel gradients
+        Func grad_x("grad_x"), grad_y("grad_y");
+        Func gaussian_clamped = BoundaryConditions::repeat_edge(gaussian, {{0, input.width()}, {0, input.height()}});
+        Expr valid_sobel = x >= 1 && x < input.width() - 1 && y >= 1 && y < input.height() - 1;
+        
+        Expr gx = -gaussian_clamped(x-1, y-1) + gaussian_clamped(x+1, y-1) +
+                  -2.0f * gaussian_clamped(x-1, y) + 2.0f * gaussian_clamped(x+1, y) +
+                  -gaussian_clamped(x-1, y+1) + gaussian_clamped(x+1, y+1);
+        
+        Expr gy = -gaussian_clamped(x-1, y-1) - 2.0f * gaussian_clamped(x, y-1) - gaussian_clamped(x+1, y-1) +
+                   gaussian_clamped(x-1, y+1) + 2.0f * gaussian_clamped(x, y+1) + gaussian_clamped(x+1, y+1);
+        
+        grad_x(x, y) = select(valid_sobel, gx, 0.0f);
+        grad_y(x, y) = select(valid_sobel, gy, 0.0f);
+
+        // Magnitude and direction
+        Func magnitude("magnitude"), direction("direction");
+        magnitude(x, y) = sqrt(grad_x(x, y) * grad_x(x, y) + grad_y(x, y) * grad_y(x, y));
+        direction(x, y) = atan2(grad_y(x, y), grad_x(x, y));
+
+        // Step 4: Non-maximum suppression
+        Func nms("nms");
+        Func magnitude_clamped = BoundaryConditions::repeat_edge(magnitude, {{0, input.width()}, {0, input.height()}});
+        Expr valid_nms = x >= 1 && x < input.width() - 1 && y >= 1 && y < input.height() - 1;
+        
+        // Convert angle to degrees and normalize
+        Expr angle_rad = direction(x, y);
+        Expr angle = select(angle_rad < 0, angle_rad + 3.14159f, angle_rad);
+        angle = angle * 180.0f / 3.14159f;
+        
+        // Get interpolated magnitudes based on gradient direction
+        Expr mag_curr = magnitude(x, y);
+        
+        // Determine which neighbors to compare based on angle
+        Expr cond1 = (angle >= 0 && angle < 22.5f) || (angle >= 157.5f && angle <= 180.0f);
+        Expr cond2 = angle >= 22.5f && angle < 67.5f;
+        Expr cond3 = angle >= 67.5f && angle < 112.5f;
+        Expr cond4 = angle >= 112.5f && angle < 157.5f;
+        
+        Expr mag1 = select(cond1, magnitude_clamped(x-1, y),
+                    select(cond2, magnitude_clamped(x+1, y-1),
+                    select(cond3, magnitude_clamped(x, y-1),
+                                  magnitude_clamped(x-1, y-1))));
+        
+        Expr mag2 = select(cond1, magnitude_clamped(x+1, y),
+                    select(cond2, magnitude_clamped(x-1, y+1),
+                    select(cond3, magnitude_clamped(x, y+1),
+                                  magnitude_clamped(x+1, y+1))));
+        
+        // Keep only local maxima
+        nms(x, y) = select(valid_nms && mag_curr >= mag1 && mag_curr >= mag2, mag_curr, 0.0f);
+
+        // Step 5: Double thresholding
+        Func edge_type("edge_type");
+        edge_type(x, y) = select(nms(x, y) >= high_threshold, cast<uint8_t>(2),
+                               select(nms(x, y) >= low_threshold, cast<uint8_t>(1),
+                                      cast<uint8_t>(0)));
+
+        // Output edge types for all channels (hysteresis tracking in post-processing)
+        output(x, y, c) = edge_type(x, y);
+
+        // Set estimates for autoscheduler
+        input.set_estimates({{0, 1920}, {0, 1080}, {0, 3}});
+        output.set_estimates({{0, 1920}, {0, 1080}, {0, 3}});
+        low_threshold.set_estimate(0.1f);
+        high_threshold.set_estimate(0.3f);
+        
+        // No manual scheduling - let the autoscheduler handle everything
+    }
+};
+
+HALIDE_REGISTER_GENERATOR(CannyGenerator, canny_auto)
+
 // Runner.cpp
 #include <Halide.h>
 #include <chrono>
@@ -142,120 +260,3 @@ int main(int argc, char **argv) {
     std::cout << "Saved output: " << argv[2] << "\n";
     return 0;
 }
-
-// Generator.cpp
-using namespace Halide;
-
-class CannyGenerator : public Halide::Generator<CannyGenerator> {
-public:
-    Input<Buffer<uint8_t>> input{"input", 3};
-    Input<float> low_threshold{"low_threshold", 0.1f};
-    Input<float> high_threshold{"high_threshold", 0.3f};
-    Output<Buffer<uint8_t>> output{"output", 3};
-
-    void generate() {
-        Var x("x"), y("y"), c("c");
-
-        // Step 1: Convert to grayscale
-        Func gray("gray");
-        Expr r = cast<float>(input(x, y, 0)) / 255.0f;
-        Expr g = cast<float>(input(x, y, 1)) / 255.0f;
-        Expr b = cast<float>(input(x, y, 2)) / 255.0f;
-        gray(x, y) = 0.299f * r + 0.587f * g + 0.114f * b;
-
-        // Step 2: Gaussian blur (5x5)
-        Func gaussian("gaussian");
-        
-        // 5x5 Gaussian kernel coefficients
-        float gauss_kernel[5][5] = {
-            {2, 4, 5, 4, 2},
-            {4, 9, 12, 9, 4},
-            {5, 12, 15, 12, 5},
-            {4, 9, 12, 9, 4},
-            {2, 4, 5, 4, 2}
-        };
-        
-        // Apply boundary conditions and compute gaussian
-        Func gray_clamped = BoundaryConditions::repeat_edge(gray, {{0, input.width()}, {0, input.height()}});
-        Expr gauss_sum = cast<float>(0);
-        Expr valid_gaussian = x >= 2 && x < input.width() - 2 && y >= 2 && y < input.height() - 2;
-        
-        for (int dy = -2; dy <= 2; dy++) {
-            for (int dx = -2; dx <= 2; dx++) {
-                gauss_sum += gray_clamped(x + dx, y + dy) * gauss_kernel[dy + 2][dx + 2];
-            }
-        }
-        gaussian(x, y) = select(valid_gaussian, gauss_sum / 159.0f, 0.0f);
-
-        // Step 3: Sobel gradients
-        Func grad_x("grad_x"), grad_y("grad_y");
-        Func gaussian_clamped = BoundaryConditions::repeat_edge(gaussian, {{0, input.width()}, {0, input.height()}});
-        Expr valid_sobel = x >= 1 && x < input.width() - 1 && y >= 1 && y < input.height() - 1;
-        
-        Expr gx = -gaussian_clamped(x-1, y-1) + gaussian_clamped(x+1, y-1) +
-                  -2.0f * gaussian_clamped(x-1, y) + 2.0f * gaussian_clamped(x+1, y) +
-                  -gaussian_clamped(x-1, y+1) + gaussian_clamped(x+1, y+1);
-        
-        Expr gy = -gaussian_clamped(x-1, y-1) - 2.0f * gaussian_clamped(x, y-1) - gaussian_clamped(x+1, y-1) +
-                   gaussian_clamped(x-1, y+1) + 2.0f * gaussian_clamped(x, y+1) + gaussian_clamped(x+1, y+1);
-        
-        grad_x(x, y) = select(valid_sobel, gx, 0.0f);
-        grad_y(x, y) = select(valid_sobel, gy, 0.0f);
-
-        // Magnitude and direction
-        Func magnitude("magnitude"), direction("direction");
-        magnitude(x, y) = sqrt(grad_x(x, y) * grad_x(x, y) + grad_y(x, y) * grad_y(x, y));
-        direction(x, y) = atan2(grad_y(x, y), grad_x(x, y));
-
-        // Step 4: Non-maximum suppression
-        Func nms("nms");
-        Func magnitude_clamped = BoundaryConditions::repeat_edge(magnitude, {{0, input.width()}, {0, input.height()}});
-        Expr valid_nms = x >= 1 && x < input.width() - 1 && y >= 1 && y < input.height() - 1;
-        
-        // Convert angle to degrees and normalize
-        Expr angle_rad = direction(x, y);
-        Expr angle = select(angle_rad < 0, angle_rad + 3.14159f, angle_rad);
-        angle = angle * 180.0f / 3.14159f;
-        
-        // Get interpolated magnitudes based on gradient direction
-        Expr mag_curr = magnitude(x, y);
-        
-        // Determine which neighbors to compare based on angle
-        Expr cond1 = (angle >= 0 && angle < 22.5f) || (angle >= 157.5f && angle <= 180.0f);
-        Expr cond2 = angle >= 22.5f && angle < 67.5f;
-        Expr cond3 = angle >= 67.5f && angle < 112.5f;
-        Expr cond4 = angle >= 112.5f && angle < 157.5f;
-        
-        Expr mag1 = select(cond1, magnitude_clamped(x-1, y),
-                    select(cond2, magnitude_clamped(x+1, y-1),
-                    select(cond3, magnitude_clamped(x, y-1),
-                                  magnitude_clamped(x-1, y-1))));
-        
-        Expr mag2 = select(cond1, magnitude_clamped(x+1, y),
-                    select(cond2, magnitude_clamped(x-1, y+1),
-                    select(cond3, magnitude_clamped(x, y+1),
-                                  magnitude_clamped(x+1, y+1))));
-        
-        // Keep only local maxima
-        nms(x, y) = select(valid_nms && mag_curr >= mag1 && mag_curr >= mag2, mag_curr, 0.0f);
-
-        // Step 5: Double thresholding
-        Func edge_type("edge_type");
-        edge_type(x, y) = select(nms(x, y) >= high_threshold, cast<uint8_t>(2),
-                               select(nms(x, y) >= low_threshold, cast<uint8_t>(1),
-                                      cast<uint8_t>(0)));
-
-        // Output edge types for all channels (hysteresis tracking in post-processing)
-        output(x, y, c) = edge_type(x, y);
-
-        // Set estimates for autoscheduler
-        input.set_estimates({{0, 1920}, {0, 1080}, {0, 3}});
-        output.set_estimates({{0, 1920}, {0, 1080}, {0, 3}});
-        low_threshold.set_estimate(0.1f);
-        high_threshold.set_estimate(0.3f);
-        
-        // No manual scheduling - let the autoscheduler handle everything
-    }
-};
-
-HALIDE_REGISTER_GENERATOR(CannyGenerator, canny_auto)

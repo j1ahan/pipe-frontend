@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, ArrowBigRight, Zap, Code } from "lucide-react";
+import { ArrowRight, Zap, Code } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { registerImageDslLanguage } from "@/lib/monacoDslLanguage";
 
@@ -45,20 +45,20 @@ function Index() {
             : Pipelined Image Processing Expression
           </span>
         </h1>
-        <p className="text-base text-slate-600 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
           A novel external DSL that provides intuitive, pipe-based declarative
-          composition syntax. With modern compilation tools, it matches or
-          exceeds Halide's performance across multiple algorithms.
+          composition syntax.<br/> With MLIR-based auto polyhedral optimization, it matches or
+          exceeds Halide's performance across multiple algorithms on both modern x86 and Apple silicon platforms.
         </p>
         
         {/* CTA Buttons */}
         <div className="flex justify-center gap-4 pt-4">
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="w-48">
             <Link to="/benchmark">
               View Benchmarks <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-          <Button asChild size="lg" variant="outline">
+          <Button asChild size="lg" variant="outline" className="w-48">
             <Link to="/syntax-guide">
               Learn Syntax <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
@@ -100,7 +100,7 @@ function Index() {
         </div>
 
         {/* Code Comparison */}
-        <div className="grid lg:grid-cols-[1fr_80px_1fr] gap-6 items-center">
+        <div className="grid lg:grid-cols-2 gap-6">
           {/* Halide Code */}
           <Card className="h-[500px]">
             <CardContent className="p-4 h-full flex flex-col">
@@ -126,13 +126,6 @@ function Index() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Arrow */}
-          <div className="flex justify-center">
-            <div className="bg-blue-600 rounded-full p-4">
-              <ArrowBigRight className="h-8 w-8 text-white" />
-            </div>
-          </div>
 
           {/* PIPE DSL Code */}
           <Card className="h-[500px]">
