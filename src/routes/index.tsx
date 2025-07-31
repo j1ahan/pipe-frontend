@@ -55,7 +55,7 @@ function Index() {
       {/* Code Comparison */}
       <div className="space-y-8">
         <h2 className="text-3xl font-bold text-center">
-          Canny Edge Detection: PIPE vs Halide
+          Canny Edge Detection: Halide vs PIPE
         </h2>
 
         <div className="grid lg:grid-cols-[1fr_80px_1fr] gap-6 items-center">
@@ -124,7 +124,7 @@ function Index() {
       </div>
 
       {/* Performance Stats */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-2xl p-8">
+      <div className="bg-blue-50/50 dark:bg-blue-950/10 rounded-2xl p-8">
         <div className="grid md:grid-cols-3 gap-8 text-center">
           <div className="space-y-2">
             <div className="text-3xl font-bold text-blue-600">36x</div>
@@ -132,7 +132,7 @@ function Index() {
             <div className="text-xs text-muted-foreground">7 vs 250+ lines</div>
           </div>
           <div className="space-y-2">
-            <div className="text-3xl font-bold text-green-600">2.25x</div>
+            <div className="text-3xl font-bold text-blue-600">2.25x</div>
             <div className="text-sm text-muted-foreground">
               Faster Execution
             </div>
@@ -141,7 +141,7 @@ function Index() {
             </div>
           </div>
           <div className="space-y-2">
-            <div className="text-3xl font-bold text-purple-600">100%</div>
+            <div className="text-3xl font-bold text-blue-600">100%</div>
             <div className="text-sm text-muted-foreground">Declarative</div>
             <div className="text-xs text-muted-foreground">
               Pure pipeline syntax

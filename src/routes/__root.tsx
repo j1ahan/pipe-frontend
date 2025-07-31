@@ -39,16 +39,21 @@ export const Route = createRootRoute({
               References
             </Link>
           </nav>
-          <Button variant="ghost" size="icon" asChild>
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub repository"
-            >
-              <Github className="h-5 w-5" />
-            </a>
-          </Button>
+          <div className="flex items-center gap-4">
+            <div className="text-lg font-bold tracking-tight">
+              <span className="text-blue-600">PIPE</span>
+            </div>
+            <Button variant="ghost" size="icon" asChild>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub repository"
+              >
+                <Github className="h-5 w-5" />
+              </a>
+            </Button>
+          </div>
         </div>
       </header>
       <main>
