@@ -50,14 +50,56 @@ function Index() {
           composition syntax. With modern compilation tools, it matches or
           exceeds Halide's performance across multiple algorithms.
         </p>
+        
+        {/* CTA Buttons */}
+        <div className="flex justify-center gap-4 pt-4">
+          <Button asChild size="lg">
+            <Link to="/benchmark">
+              View Benchmarks <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="outline">
+            <Link to="/syntax-guide">
+              Learn Syntax <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      {/* Code Comparison */}
+      {/* Code Comparison Section */}
       <div className="space-y-8">
         <h2 className="text-3xl font-bold text-center">
           Canny Edge Detection: Halide vs PIPE
         </h2>
 
+        {/* Performance Stats */}
+        <div className="bg-blue-50/50 dark:bg-blue-950/10 rounded-2xl p-8">
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-blue-600">36x</div>
+              <div className="text-sm text-muted-foreground">Less Code</div>
+              <div className="text-xs text-muted-foreground">7 vs 250+ lines</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-blue-600">2.25x</div>
+              <div className="text-sm text-muted-foreground">
+                Faster Execution
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Performance speedup
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-blue-600">100%</div>
+              <div className="text-sm text-muted-foreground">Declarative</div>
+              <div className="text-xs text-muted-foreground">
+                Pure pipeline syntax
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Code Comparison */}
         <div className="grid lg:grid-cols-[1fr_80px_1fr] gap-6 items-center">
           {/* Halide Code */}
           <Card className="h-[500px]">
@@ -120,50 +162,6 @@ function Index() {
               </div>
             </CardContent>
           </Card>
-        </div>
-      </div>
-
-      {/* Performance Stats */}
-      <div className="bg-blue-50/50 dark:bg-blue-950/10 rounded-2xl p-8">
-        <div className="grid md:grid-cols-3 gap-8 text-center">
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-blue-600">36x</div>
-            <div className="text-sm text-muted-foreground">Less Code</div>
-            <div className="text-xs text-muted-foreground">7 vs 250+ lines</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-blue-600">2.25x</div>
-            <div className="text-sm text-muted-foreground">
-              Faster Execution
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Performance speedup
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-blue-600">100%</div>
-            <div className="text-sm text-muted-foreground">Declarative</div>
-            <div className="text-xs text-muted-foreground">
-              Pure pipeline syntax
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="text-center space-y-6">
-        <h3 className="text-2xl font-semibold">Explore PIPE DSL</h3>
-        <div className="flex justify-center gap-4">
-          <Button asChild size="lg">
-            <Link to="/benchmark">
-              View Benchmarks <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <Button asChild size="lg" variant="outline">
-            <Link to="/syntax-guide">
-              Learn Syntax <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
         </div>
       </div>
     </div>
