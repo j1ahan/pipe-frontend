@@ -32,6 +32,12 @@ export const Route = createRootRoute({
             >
               Syntax Guide
             </Link>
+            <Link
+              to="/references"
+              className="px-4 py-2 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              References
+            </Link>
           </nav>
           <Button variant="ghost" size="icon" asChild>
             <a
