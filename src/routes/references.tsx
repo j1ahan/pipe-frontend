@@ -45,7 +45,7 @@ function References() {
     <div className="container mx-auto px-4 py-12 space-y-8">
       <div className="text-center space-y-4 max-w-3xl mx-auto">
         <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">
-          References & Acknowledgements
+          References
         </h1>
         <p className="text-base text-slate-600">
           This project builds upon the work of many excellent tools, libraries, and research papers in the field of compiler design and image processing.

@@ -26,18 +26,13 @@
       "tags": ["library", "computer-vision", "image-processing"]
     },
     {
-      "name": "Eigen",
-      "url": "https://gitlab.com/libeigen/eigen",
-      "tags": ["library", "linear-algebra", "mathematics"]
-    },
-    {
-      "name": "Berkeley Segmentation Dataset",
-      "url": "https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/bsds/",
-      "tags": ["dataset", "segmentation", "benchmark"]
-    },
-    {
       "name": "Kodak Image Suite",
       "url": "http://r0k.us/graphics/kodak/",
+      "tags": ["dataset", "benchmark", "test-images"]
+    },
+    {
+      "name": "DIV2K dataset",
+      "url": "https://data.vision.ee.ethz.ch/cvl/DIV2K/",
       "tags": ["dataset", "benchmark", "test-images"]
     },
     {
@@ -46,9 +41,19 @@
       "tags": ["compiler", "polyhedral", "optimization"]
     },
     {
-      "name": "ISL",
-      "url": "https://github.com/Meinersbur/isl",
-      "tags": ["library", "polyhedral", "integer-sets"]
+      "name": "Menhir",
+      "url": "https://gitlab.inria.fr/fpottier/menhir",
+      "tags": ["parser"]
+    },
+    {
+      "name": "Hyperfine",
+      "url": "https://github.com/sharkdp/hyperfine",
+      "tags":["benchmarking"]
+    },
+    {
+      "name": "stb image lib",
+      "url": "https://github.com/nothings/stb",
+      "tags": ["I/O"]
     }
   ]
 }
