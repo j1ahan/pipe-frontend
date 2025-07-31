@@ -3,7 +3,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Editor from '@monaco-editor/react';
 import { registerImageDslLanguage } from '@/lib/monacoDslLanguage';
@@ -109,7 +108,7 @@ function Benchmark() {
                   language="imageDsl"
                   value={dslCode}
                   options={{ readOnly: true, minimap: { enabled: false } }}
-                  onMount={(editor, monaco) => {
+                  onMount={(_, monaco) => {
                     registerImageDslLanguage(monaco);
                   }}
                 />

@@ -10,18 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SyntaxGuideRouteImport } from './routes/syntax-guide'
-import { Route as PlaygroundRouteImport } from './routes/playground'
 import { Route as BenchmarkRouteImport } from './routes/benchmark'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SyntaxGuideRoute = SyntaxGuideRouteImport.update({
   id: '/syntax-guide',
   path: '/syntax-guide',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaygroundRoute = PlaygroundRouteImport.update({
-  id: '/playground',
-  path: '/playground',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BenchmarkRoute = BenchmarkRouteImport.update({
@@ -38,34 +32,30 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/benchmark': typeof BenchmarkRoute
-  '/playground': typeof PlaygroundRoute
   '/syntax-guide': typeof SyntaxGuideRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/benchmark': typeof BenchmarkRoute
-  '/playground': typeof PlaygroundRoute
   '/syntax-guide': typeof SyntaxGuideRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/benchmark': typeof BenchmarkRoute
-  '/playground': typeof PlaygroundRoute
   '/syntax-guide': typeof SyntaxGuideRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/benchmark' | '/playground' | '/syntax-guide'
+  fullPaths: '/' | '/benchmark' | '/syntax-guide'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/benchmark' | '/playground' | '/syntax-guide'
-  id: '__root__' | '/' | '/benchmark' | '/playground' | '/syntax-guide'
+  to: '/' | '/benchmark' | '/syntax-guide'
+  id: '__root__' | '/' | '/benchmark' | '/syntax-guide'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BenchmarkRoute: typeof BenchmarkRoute
-  PlaygroundRoute: typeof PlaygroundRoute
   SyntaxGuideRoute: typeof SyntaxGuideRoute
 }
 
@@ -76,13 +66,6 @@ declare module '@tanstack/react-router' {
       path: '/syntax-guide'
       fullPath: '/syntax-guide'
       preLoaderRoute: typeof SyntaxGuideRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/playground': {
-      id: '/playground'
-      path: '/playground'
-      fullPath: '/playground'
-      preLoaderRoute: typeof PlaygroundRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/benchmark': {
@@ -105,7 +88,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BenchmarkRoute: BenchmarkRoute,
-  PlaygroundRoute: PlaygroundRoute,
   SyntaxGuideRoute: SyntaxGuideRoute,
 }
 export const routeTree = rootRouteImport

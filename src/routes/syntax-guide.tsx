@@ -289,7 +289,7 @@ function SyntaxGuide() {
         language={language}
         value={code}
         theme="vs"
-        onMount={(editor, monaco) => {
+        onMount={(_, monaco) => {
           registerImageDslLanguage(monaco);
         }}
         options={{

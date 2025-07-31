@@ -13,9 +13,6 @@ export const Route = createFileRoute('/')({
 function Index() {
   const [dslCode, setDslCode] = useState<string>('// Loading...');
   const [halideCode, setHalideCode] = useState<string>('// Loading...');
-  const [dslTime, setDslTime] = useState<string>('--');
-  const [halideTime, setHalideTime] = useState<string>('--');
-
   useEffect(() => {
     const loadCodes = async () => {
       try {
@@ -29,18 +26,10 @@ function Index() {
         const halideText = halideResponse.ok ? await halideResponse.text() : '// Error loading Halide code.';
         setHalideCode(halideText);
 
-        // Load timing data
-        const resultResponse = await fetch('/examples/canny/result.json');
-        if (resultResponse.ok) {
-          const resultData = await resultResponse.json();
-          setDslTime(resultData.dsl);
-          setHalideTime(resultData.halide);
-        }
       } catch (error) {
         console.error("Failed to load code data:", error);
       }
     };
-
     loadCodes();
   }, []);
   return (
@@ -114,7 +103,7 @@ function Index() {
                     scrollBeyondLastLine: false,
                     fontSize: 14,
                   }}
-                  onMount={(editor, monaco) => {
+                  onMount={(_, monaco) => {
                     registerImageDslLanguage(monaco);
                   }}
                 />
