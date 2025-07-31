@@ -1,0 +1,54 @@
+{
+  "references": [
+    {
+      "name": "MLIR",
+      "url": "https://github.com/llvm/llvm-project/tree/main/mlir",
+      "tags": ["compiler", "infrastructure", "dialect"]
+    },
+    {
+      "name": "LLVM",
+      "url": "https://github.com/llvm/llvm-project",
+      "tags": ["compiler", "backend", "optimization"]
+    },
+    {
+      "name": "Halide",
+      "url": "https://github.com/halide/Halide",
+      "tags": ["DSL", "image-processing", "scheduling"]
+    },
+    {
+      "name": "PolyMage",
+      "url": "https://github.com/bondhugula/polymage",
+      "tags": ["DSL", "polyhedral", "image-processing"]
+    },
+    {
+      "name": "OpenCV",
+      "url": "https://github.com/opencv/opencv",
+      "tags": ["library", "computer-vision", "image-processing"]
+    },
+    {
+      "name": "Eigen",
+      "url": "https://gitlab.com/libeigen/eigen",
+      "tags": ["library", "linear-algebra", "mathematics"]
+    },
+    {
+      "name": "Berkeley Segmentation Dataset",
+      "url": "https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/bsds/",
+      "tags": ["dataset", "segmentation", "benchmark"]
+    },
+    {
+      "name": "Kodak Image Suite",
+      "url": "http://r0k.us/graphics/kodak/",
+      "tags": ["dataset", "benchmark", "test-images"]
+    },
+    {
+      "name": "Polly",
+      "url": "https://polly.llvm.org/",
+      "tags": ["compiler", "polyhedral", "optimization"]
+    },
+    {
+      "name": "ISL",
+      "url": "https://github.com/Meinersbur/isl",
+      "tags": ["library", "polyhedral", "integer-sets"]
+    }
+  ]
+}
