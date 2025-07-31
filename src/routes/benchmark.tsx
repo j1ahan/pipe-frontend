@@ -44,14 +44,9 @@ function Benchmark() {
           setHalideTime('-- ms');
         }
 
-        // Set image paths (only canny has images for now)
-        if (selectedOperator === 'canny') {
-          setOriginalImage(`/examples/${selectedOperator}/original.png`);
-          setProcessedImage(`/examples/${selectedOperator}/processed.png`);
-        } else {
-          setOriginalImage(null);
-          setProcessedImage(null);
-        }
+        // Set image paths
+        setOriginalImage(`/examples/${selectedOperator}/original.png`);
+        setProcessedImage(`/examples/${selectedOperator}/processed.png`);
       } catch (error) {
         console.error("Failed to load benchmark data:", error);
         setDslCode('// Error loading DSL code.');
@@ -79,7 +74,7 @@ function Benchmark() {
               <SelectContent>
                 <SelectItem value="canny">Canny Edge Detection</SelectItem>
                 <SelectItem value="blur">Gaussian Blur</SelectItem>
-                <SelectItem value="grayscale" disabled>Grayscale (Placeholder)</SelectItem>
+                <SelectItem value="grayscale">Grayscale</SelectItem>
               </SelectContent>
             </Select>
           </div>
