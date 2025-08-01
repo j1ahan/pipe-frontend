@@ -20,6 +20,7 @@ function Benchmark() {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
 
+
   useEffect(() => {
     const loadBenchmarkData = async () => {
       try {
@@ -44,9 +45,22 @@ function Benchmark() {
           setHalideTime('-- ms');
         }
 
-        // Set image paths
-        setOriginalImage(`/examples/${selectedOperator}/original.png`);
-        setProcessedImage(`/examples/${selectedOperator}/processed.png`);
+        // Special handling for canny operator
+        const basePath = `/examples/${selectedOperator}`;
+        let originalImagePath: string | null;
+        let processedImagePath: string | null;
+        
+        if (selectedOperator === 'canny') {
+          originalImagePath = `${basePath}/original.jpg`;
+          processedImagePath = `${basePath}/processed.png`;
+        } else {
+          // For other operators, use PNG format
+          originalImagePath = `${basePath}/original.png`;
+          processedImagePath = `${basePath}/processed.png`;
+        }
+        
+        setOriginalImage(originalImagePath);
+        setProcessedImage(processedImagePath);
       } catch (error) {
         console.error("Failed to load benchmark data:", error);
         setDslCode('// Error loading DSL code.');

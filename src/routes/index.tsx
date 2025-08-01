@@ -46,8 +46,8 @@ function Index() {
           </span>
         </h1>
         <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-          A novel external DSL that provides intuitive, pipe-based declarative
-          composition syntax.<br/> With MLIR-based auto polyhedral optimization, it matches or
+          PIPE is a novel external DSL that provides intuitive, pipe-based declarative
+          composition syntax.<br/> With MLIR-based auto polyhedral optimization, PIPE matches or
           exceeds Halide's performance across multiple algorithms on both modern x86 and Apple silicon platforms.
         </p>
         
