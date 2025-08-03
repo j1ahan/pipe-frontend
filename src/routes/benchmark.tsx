@@ -2,8 +2,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import Editor from '@monaco-editor/react';
 import { registerImageDslLanguage } from '@/lib/monacoDslLanguage';
 
@@ -75,32 +74,49 @@ function Benchmark() {
     loadBenchmarkData();
   }, [selectedOperator]);
 
+  const operators = [
+    { id: 'grayscale', name: 'Grayscale', available: true },
+    { id: 'brightness', name: 'Brightness', available: false },
+    { id: 'blur', name: 'Gaussian Blur', available: true },
+    { id: 'sobel', name: 'Sobel Edge Detection', available: false },
+    { id: 'conv', name: 'Convolution (Laplacian Kernel)', available: false },
+    { id: 'canny', name: 'Canny Edge Detection', available: true },
+    { id: 'harris', name: 'Harris Corner Detection', available: false },
+    { id: 'unsharpmask', name: 'Unsharp Mask', available: false },
+    { id: 'bilateral', name: 'Bilateral Filter', available: false },
+    { id: 'custom', name: 'Custom Pipeline', available: false },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-4 space-y-6">
-      {/* Row 1: Algorithm selector and time comparison */}
+      {/* Row 1: Algorithm selector buttons */}
       <Card>
-        <CardContent className="p-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <Select onValueChange={setSelectedOperator} defaultValue={selectedOperator}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select an operator" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="canny">Canny Edge Detection</SelectItem>
-                <SelectItem value="blur">Gaussian Blur</SelectItem>
-                <SelectItem value="grayscale">Grayscale</SelectItem>
-              </SelectContent>
-            </Select>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-5 gap-3">
+            {operators.slice(0, 5).map((operator) => (
+              <Button
+                key={operator.id}
+                variant={selectedOperator === operator.id ? "default" : "outline"}
+                disabled={!operator.available}
+                onClick={() => operator.available && setSelectedOperator(operator.id)}
+                className="h-12"
+              >
+                {operator.name}
+              </Button>
+            ))}
           </div>
-          <div className="flex items-center space-x-8">
-            <div className="text-right">
-              <Label>PIPE Execution Time</Label>
-              <p className="text-2xl font-bold">{dslTime}</p>
-            </div>
-            <div className="text-right">
-              <Label>Halide Execution Time</Label>
-              <p className="text-2xl font-bold">{halideTime}</p>
-            </div>
+          <div className="grid grid-cols-5 gap-3 mt-3">
+            {operators.slice(5, 10).map((operator) => (
+              <Button
+                key={operator.id}
+                variant={selectedOperator === operator.id ? "default" : "outline"}
+                disabled={!operator.available}
+                onClick={() => operator.available && setSelectedOperator(operator.id)}
+                className="h-12"
+              >
+                {operator.name}
+              </Button>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -110,7 +126,7 @@ function Benchmark() {
         <CardContent className="p-4">
           <div className="grid grid-cols-2 gap-4 h-[500px]">
             <div className="flex flex-col">
-              <CardTitle className="mb-4">PIPE Version</CardTitle>
+              <CardTitle className="mb-4">PIPE Version ({dslTime})</CardTitle>
               <div className="flex-grow border rounded-md overflow-hidden">
                 <Editor
                   height="100%"
@@ -124,7 +140,7 @@ function Benchmark() {
               </div>
             </div>
             <div className="flex flex-col">
-              <CardTitle className="mb-4">Halide Version</CardTitle>
+              <CardTitle className="mb-4">Halide Version ({halideTime})</CardTitle>
               <div className="flex-grow border rounded-md overflow-hidden">
                 <Editor
                   height="100%"

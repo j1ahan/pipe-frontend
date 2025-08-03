@@ -81,7 +81,7 @@ function Index() {
               <div className="text-xs text-muted-foreground">7 vs 250+ lines</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-blue-600">2.25x</div>
+              <div className="text-3xl font-bold text-blue-600">2.19x</div>
               <div className="text-sm text-muted-foreground">
                 Faster Execution
               </div>
